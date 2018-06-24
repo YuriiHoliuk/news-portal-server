@@ -22,6 +22,8 @@ async function start(port) {
 
     articleRoutes(app);
     commentRoutes(app);
+
+    app.get('*', (req, res) => res.send({ message: 'Not Found.' }));
     
     app.listen(port, () => console.log(`App listen on port ${port}.`));
 };
