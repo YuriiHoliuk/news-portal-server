@@ -1,0 +1,26 @@
+{
+  "name": "news-portal-server",
+  "version": "1.0.0",
+  "description": "RestAPI Mongoose server for News Portal",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index"
+  },
+  "keywords": [
+    "Node",
+    "Express",
+    "Mongo",
+    "Mongoose"
+  ],
+  "author": "Yurii Holiuk",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongoose": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/node": "^10.3.5"
+  }
+}
