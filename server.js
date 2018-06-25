@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const dbConfig = require('./config/database.config');
-const cors = require('cors');
+const cors = require('./app/middlewares/cors.middleware');
 const articleRoutes = require('./app/routes/article.routes');
 const commentRoutes = require('./app/routes/comment.routes');
 
@@ -20,7 +20,7 @@ async function start(port) {
     const app = express();
     const router = express.Router();
 
-    app.use(cors());
+    app.use(cors);
 
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
