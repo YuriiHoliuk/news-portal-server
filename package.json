@@ -4,7 +4,8 @@
   "description": "RestAPI Mongoose server for News Portal",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index"
+    "start": "node index",
+    "start:local": "nodemon index"
   },
   "keywords": [
     "Node",
