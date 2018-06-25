@@ -1,12 +1,12 @@
 const Article = require('../models/article.model');
 const Comment = require('../models/comment.model');
 
-const articleMapper = require('../mappers/article.mapper');
 const commentMapper = require('../mappers/comment.mapper');
 
 const create = async (req, res) => {
-    const comment = req.body;
-    const articleId = comment.article;
+    const { articleId } = req.query;
+    const { text } = req.body;
+    const comment = { article: articleId, text };
 
     let article;
 
