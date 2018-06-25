@@ -1,7 +1,8 @@
-const { Types: { ObjectId } } = require('mongoose');
-
 const Article = require('../models/article.model');
 const Comment = require('../models/comment.model');
+
+const articleMapper = require('../mappers/article.mapper');
+const commentMapper = require('../mappers/comment.mapper');
 
 const create = async (req, res) => {
     const comment = req.body;
@@ -28,7 +29,7 @@ const create = async (req, res) => {
          article.comments.push(savedComment._id);
          await article.save();
  
-         res.send(savedComment);
+         res.send(commentMapper(savedComment));
     } catch (error) {
         res.status(500).send({ message: error.message || 'Cannot save Comment.' });
     }
@@ -40,7 +41,7 @@ const findByArticleId = async (req, res) => {
     try {
         const query = articleId ? { article: articleId } : {};
 
-        res.send(await Comment.find(query));
+        res.send(commentMapper(await Comment.find(query)));
     } catch (error) {
         res.status(500).send({ message: error.message || 'Cannot retrive Comment.' })
     }
@@ -56,7 +57,7 @@ const remove = async (req, res) => {
             return res.status(404).send({ message: `Cannot find comment with id: ${id}` });
         }
 
-        res.send(comment);
+        res.send(commentMapper(comment));
     } catch (error) {
         if (error.kind === 'ObjectId' || error.name === 'NotFound') {
             return res.status(404).send({ message: `Cannot find comment with id: ${id}` });

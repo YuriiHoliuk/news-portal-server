@@ -3,6 +3,8 @@ const { Types: { ObjectId } } = require('mongoose');
 const Article = require('../models/article.model');
 const Comment = require('../models/comment.model');
 
+const articleMapper = require('../mappers/article.mapper');
+
 const create = async (req, res) => {
     const { title, text, comments } = req.body;
     const articleId = ObjectId();
@@ -21,7 +23,7 @@ const create = async (req, res) => {
          await article.save();
          const articleWithComments = await Article.findById(articleId).populate('comments');
  
-         res.send(articleWithComments);
+         res.send(articleMapper(articleWithComments));
     } catch (error) {
         res.status(500).send({ message: error.message || 'Cannot save Article.' });
     }
@@ -29,7 +31,7 @@ const create = async (req, res) => {
 
 const findAll = async (req, res) => {
     try {
-        res.send(await Article.find().populate('comments'));
+        res.send((await Article.find().populate('comments')).map(articleMapper));
     } catch (error) {
         res.status(500).send({ message: error.message || 'Cannot retrive articles.' });
     }
@@ -48,7 +50,7 @@ const remove = async (req, res) => {
         const removeQueries = article.comments.map(comment => comment.remove());
         await Promise.all(removeQueries);
 
-        res.send(article);
+        res.send(articleMapper(article));
     } catch (error) {
         if (error.kind === 'ObjectId' || error.name === 'NotFound') {
             return res.status(404).send({ message: `Cannot find article with id: ${id}` });
