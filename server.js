@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+
 const dbConfig = require('./config/database.config');
+const cors = require('./app/middlewares/cors.middleware');
 const articleRoutes = require('./app/routes/article.routes');
 const commentRoutes = require('./app/routes/comment.routes');
 
@@ -16,18 +18,17 @@ async function start(port) {
     }
 
     const app = express();
+    const router = express.Router();
 
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
 
-    app.use((req, res, next) => {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-        next();
-    });
+    app.use(cors);
 
-    articleRoutes(app);
-    commentRoutes(app);
+    articleRoutes(router);
+    commentRoutes(router);
+
+    app.use('/api/v1', router);
 
     app.get('*', (req, res) => res.send({message: 'Not Found.'}));
 

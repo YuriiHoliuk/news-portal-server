@@ -1,7 +1,7 @@
 const articles = require('../controllers/article.controller.js');
     
-module.exports = (app) => {
-    app.post('/articles', articles.create);
-    app.get('/articles', articles.findAll);
-    app.delete('/articles/:id', articles.remove);
-}
+module.exports = (router) => {
+    router.post('/articles', articles.create);
+    router.get('/articles', articles.findAll);
+    router.delete('/articles/:id', articles.remove);
+};
