@@ -20,10 +20,10 @@ async function start(port) {
     const app = express();
     const router = express.Router();
 
+    app.use(cors);
+
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
-
-    app.use(cors);
 
     articleRoutes(router);
     commentRoutes(router);
