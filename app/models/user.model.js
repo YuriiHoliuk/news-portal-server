@@ -7,6 +7,10 @@ const UserSchema = mongoose.Schema({
         required: 'Email is required',
         unique: 'This email already exist',
     },
+    name: {
+       type: String,
+       required: 'Name is required',
+    },
     passwordHash: String,
     salt: String,
 }, {timestamps: true});
@@ -17,7 +21,7 @@ UserSchema.virtual('password')
 
         if (password) {
             this.salt = crypto.randomBytes(128).toString('base64');
-            this.passwordHash = crypto.pbkdf2Sync(password, this.salt, 1, 128, 'sha1');
+            this.passwordHash = crypto.pbkdf2Sync(password.toString(), this.salt, 1, 128, 'sha1');
 
         } else {
             this.salt = undefined;
@@ -33,7 +37,8 @@ UserSchema.methods.checkPassword = function (password) {
         return false;
     }
 
-    return crypto.pbkdf2Sync(password, this.salt, 1, 128, 'sha1') === this.passwordHash;
+    // TODO: why strict equal do not work?
+    return crypto.pbkdf2Sync(password.toString(), this.salt, 1, 128, 'sha1') == this.passwordHash;
 };
 
 module.exports = mongoose.model('User', UserSchema);

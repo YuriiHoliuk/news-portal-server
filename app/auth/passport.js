@@ -7,6 +7,7 @@ const jwtConfig = require('../../config/jwt.config');
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: jwtConfig.secret,
+    session: false,
 };
 
 function configurePassport() {
@@ -18,7 +19,6 @@ function configurePassport() {
         },
         (email, password, done) => User.findOne({ email })
             .then(user => {
-
                 if (!user || !user.checkPassword(password)) {
                     return done(null, false, { message: 'Invalid token' });
                 }
@@ -28,9 +28,11 @@ function configurePassport() {
             .catch(error => done(error))
     ));
 
-    passport.use(new JWTStrategy(jwtOptions, function (payload, done) {
-        return User.findById(payload.id)
-            .then(user => user ? done(null, user) : done(null, false))
+    passport.use(new JWTStrategy(jwtOptions, function (decodedToken, done) {
+        return User.findById(decodedToken.data.id)
+            .then(user => {
+                return user ? done(null, user) : done(null, false)
+            })
             .catch(error => done(error))
     }));
 

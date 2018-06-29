@@ -1,10 +1,8 @@
-const passport = require('passport');
-
-const articles = require('../controllers/article.controller.js');
+const { jwt } = require('../middlewares/auth.middleware');
+const { findAll, create, remove } = require('../controllers/article.controller.js');
     
 module.exports = (router) => {
-    router.get('/articles', articles.findAll);
-    router.all('/articles/*', passport.authenticate('jwt'));
-    router.post('/articles', articles.create);
-    router.delete('/articles/:id', articles.remove);
+    router.get('/articles', findAll);
+    router.post('/articles', jwt(), create);
+    router.delete('/articles/:id', jwt(), remove);
 };
