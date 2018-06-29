@@ -6,6 +6,8 @@ const dbConfig = require('./config/database.config');
 const cors = require('./app/middlewares/cors.middleware');
 const articleRoutes = require('./app/routes/article.routes');
 const commentRoutes = require('./app/routes/comment.routes');
+const userRoutes = require('./app/routes/user.routes');
+const passport = require('./app/auth/passport');
 
 async function start(port) {
     mongoose.Promise = global.Promise;
@@ -24,7 +26,9 @@ async function start(port) {
 
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
+    app.use(passport.initialize());
 
+    userRoutes(router);
     articleRoutes(router);
     commentRoutes(router);
 

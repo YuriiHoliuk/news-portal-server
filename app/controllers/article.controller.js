@@ -31,7 +31,8 @@ const create = async (req, res) => {
 
 const findAll = async (req, res) => {
     try {
-        res.send((await Article.find().populate('comments')).map(articleMapper));
+        const items = (await Article.find().populate('comments')).map(articleMapper);
+        res.send({ items });
     } catch (error) {
         res.status(500).send({ message: error.message || 'Cannot retrive articles.' });
     }

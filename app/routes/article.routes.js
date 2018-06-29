@@ -1,7 +1,8 @@
-const articles = require('../controllers/article.controller.js');
+const { jwt } = require('../middlewares/auth.middleware');
+const { findAll, create, remove } = require('../controllers/article.controller.js');
     
 module.exports = (router) => {
-    router.post('/articles', articles.create);
-    router.get('/articles', articles.findAll);
-    router.delete('/articles/:id', articles.remove);
+    router.get('/articles', findAll);
+    router.post('/articles', jwt(), create);
+    router.delete('/articles/:id', jwt(), remove);
 };

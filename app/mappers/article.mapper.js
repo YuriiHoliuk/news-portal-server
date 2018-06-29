@@ -4,7 +4,7 @@ module.exports = function articleMapper(article) {
     const { _id, title, text, createdAt, comments } = article;
 
     return {
-        id: _id,
+        _id,
         title,
         text,
         date: createdAt,

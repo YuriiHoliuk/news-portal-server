@@ -1,7 +1,8 @@
-const comments = require('../controllers/comment.controller.js');
+const { jwt } = require('../middlewares/auth.middleware');
+const { findByArticleId, create, remove } = require('../controllers/comment.controller.js');
     
 module.exports = (router) => {
-    router.post('/comments', comments.create);
-    router.get('/comments', comments.findByArticleId);
-    router.delete('/comments/:id', comments.remove);
+    router.get('/comments', findByArticleId);
+    router.post('/comments', jwt(), create);
+    router.delete('/comments/:id', jwt(), remove);
 };
