@@ -1,5 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const { promisify } = require('util');
+
+const readFile = promisify(fs.readFile);
 
 const cors = require('./app/middlewares/cors.middleware');
 
@@ -12,47 +17,50 @@ async function start(port) {
     app.use(bodyParser.json());
 
     app.get('/api/v1/restaurants', async(req, res) => {
-        console.log('route restaurants', req);
-
         try {
             const { location = 'london' } = req.query;
             const dataPath = path.join(__dirname, 'data', 'location', `${location}.json`);
             const file = await readFile(dataPath);
-            console.log(file.toString());
 
             res.json(JSON.parse(file.toString()));
         } catch (e) {
-            res.setStatus(500);
-            res.json(e);
+            console.log(e);
+            res.sendStatus(500);
         }
     });
 
     app.get('/api/v1/restaurants/:id', async(req, res) => {
-        const { id } = req.params;
-        const dataPath = path.join(__dirname, 'data', 'restaurants', `${id}.json`);
-        const file = await readFile(dataPath);
-        const restaurantData = JSON.parse(file.toString());
-        const {
-            data: {
-                sections: { 0: { subsectionUuids: sections, uuid: firstSectionUuid } },
-                subsectionsMap: sectionsMap,
-                sectionEntitiesMap,
-                ...restData
-            },
-            ...rest
-        } = restaurantData;
-        const entitiesMap = sectionEntitiesMap[firstSectionUuid];
-        const responseData = {
-            data: {
-                ...restData,
-                sections,
-                sectionsMap,
-                entitiesMap,
-            },
-            ...rest,
-        };
+        try {
+            const { id } = req.params;
+            const dataPath = path.join(__dirname, 'data', 'restaurants', `${id}.json`);
+            const file = await readFile(dataPath);
+            const restaurantData = JSON.parse(file.toString());
+            const {
+                data: {
+                    sections: { 0: { subsectionUuids: sections, uuid: firstSectionUuid } },
+                    subsectionsMap: sectionsMap,
+                    sectionEntitiesMap,
+                    ...restData
+                },
+                ...rest
+            } = restaurantData;
+            const entitiesMap = sectionEntitiesMap[firstSectionUuid];
+            const responseData = {
+                data: {
+                    ...restData,
+                    sections,
+                    sectionsMap,
+                    entitiesMap,
+                },
+                ...rest,
+            };
 
-        res.json(responseData);
+            res.json(responseData);
+        } catch (e) {
+            console.log(e);
+            res.sendStatus(500);
+            res.sendStatus(500);
+        }
     });
 
     app.get('*', (req, res) => res.send({message: 'Not Found.'}));
