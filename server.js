@@ -12,11 +12,19 @@ async function start(port) {
     app.use(bodyParser.json());
 
     app.get('/api/v1/restaurants', async(req, res) => {
-        const { location = 'london' } = req.query;
-        const dataPath = path.join(__dirname, 'data', 'location', `${location}.json`);
-        const file = await readFile(dataPath);
+        console.log('route restaurants', req);
 
-        res.json(JSON.parse(file.toString()));
+        try {
+            const { location = 'london' } = req.query;
+            const dataPath = path.join(__dirname, 'data', 'location', `${location}.json`);
+            const file = await readFile(dataPath);
+            console.log(file.toString());
+
+            res.json(JSON.parse(file.toString()));
+        } catch (e) {
+            res.setStatus(500);
+            res.json(e);
+        }
     });
 
     app.get('/api/v1/restaurants/:id', async(req, res) => {
