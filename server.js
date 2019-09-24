@@ -1,38 +1,51 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 
-const dbConfig = require('./config/database.config');
 const cors = require('./app/middlewares/cors.middleware');
-const articleRoutes = require('./app/routes/article.routes');
-const commentRoutes = require('./app/routes/comment.routes');
-const userRoutes = require('./app/routes/user.routes');
-const passport = require('./app/auth/passport');
 
 async function start(port) {
-    mongoose.Promise = global.Promise;
-
-    try {
-        await mongoose.connect(dbConfig.url);
-        console.log('Connected to db!');
-    } catch (e) {
-        console.error('Cannot connect to db');
-    }
-
     const app = express();
-    const router = express.Router();
 
     app.use(cors);
 
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
-    app.use(passport.initialize());
 
-    userRoutes(router);
-    articleRoutes(router);
-    commentRoutes(router);
+    app.get('/api/v1/restaurants', async(req, res) => {
+        const { location = 'london' } = req.query;
+        const dataPath = path.join(__dirname, 'data', 'location', `${location}.json`);
+        const file = await readFile(dataPath);
 
-    app.use('/api/v1', router);
+        res.json(JSON.parse(file.toString()));
+    });
+
+    app.get('/api/v1/restaurants/:id', async(req, res) => {
+        const { id } = req.params;
+        const dataPath = path.join(__dirname, 'data', 'restaurants', `${id}.json`);
+        const file = await readFile(dataPath);
+        const restaurantData = JSON.parse(file.toString());
+        const {
+            data: {
+                sections: { 0: { subsectionUuids: sections, uuid: firstSectionUuid } },
+                subsectionsMap: sectionsMap,
+                sectionEntitiesMap,
+                ...restData
+            },
+            ...rest
+        } = restaurantData;
+        const entitiesMap = sectionEntitiesMap[firstSectionUuid];
+        const responseData = {
+            data: {
+                ...restData,
+                sections,
+                sectionsMap,
+                entitiesMap,
+            },
+            ...rest,
+        };
+
+        res.json(responseData);
+    });
 
     app.get('*', (req, res) => res.send({message: 'Not Found.'}));
 
